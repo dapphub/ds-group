@@ -1,5 +1,5 @@
 import 'dapple/test.sol';
-import "multisig_factory.sol";
+import "basic_multisig_factory.sol";
 
 contract DSMultisigFactoryTest is Test {
     DSMultisigFactory factory;

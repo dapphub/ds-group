@@ -1,6 +1,6 @@
 import "dapple/test.sol";
 
-import "multisig_factory.sol";
+import "basic_multisig_factory.sol";
 
 contract Dummy {
     bool _fail;
