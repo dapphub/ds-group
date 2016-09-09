@@ -1,7 +1,7 @@
 ds-multisig
 ===========
 
-This repository contains two multisig implementations and one factory.
+This repository contains two multisig implementations and two factories.
 
 `DSEasyMultisig` is what used to be `dappsys/gov/easy_multisig`.
 
