@@ -2,12 +2,12 @@ import 'auth/auth.sol';
 import 'easy_multisig.sol';
 
 contract DSEasyMultisigFactory is DSAuthUser {
-    mapping(address=>bool) is_easy_multisig;
+    mapping(address=>bool) public isDSEasyMultisig;
 
     function buildDSEasyMultisig( uint n, uint m, uint expiration ) returns (DSEasyMultisig ret)
     {
         ret = new DSEasyMultisig( n, m, expiration );
-        is_easy_multisig[address(ret)] = true;
+        isDSEasyMultisig[address(ret)] = true;
         setOwner( ret, msg.sender );
     }
 
@@ -16,7 +16,7 @@ contract DSEasyMultisigFactory is DSAuthUser {
     function buildDSEasyMultisigWithMembers( uint n, uint m, uint expiration, address[] members ) returns (DSEasyMultisig ret)
     {
         ret = new DSEasyMultisig( n, m, expiration );
-        is_easy_multisig[address(ret)] = true;
+        isDSEasyMultisig[address(ret)] = true;
 
         for (var i = 0; i < members.length; i++) {
             ret.addMember(members[i]);
@@ -25,12 +25,5 @@ contract DSEasyMultisigFactory is DSAuthUser {
         if (members.length < m) {
             setOwner( ret, msg.sender );
         }
-    }
-
-    function isDSEasyMultisig(address code)
-        constant
-        returns (bool)
-    {
-        return is_easy_multisig[code];
     }
 }
