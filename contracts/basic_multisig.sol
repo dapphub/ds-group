@@ -63,6 +63,7 @@ contract DSBasicMultisig is DSBasicMultisigEvents {
     }
 
     address[]  public  target;
+    string[]   public  signature;
     bytes[]    public  calldata;
     uint[]     public  value;
 
@@ -73,12 +74,16 @@ contract DSBasicMultisig is DSBasicMultisigEvents {
 
     mapping (uint => mapping (address => bool))  public  confirmedBy;
 
-    function propose(address _target, bytes _calldata, uint _value)
-        returns (uint id)
-    {
+    function propose(
+        address  _target,
+        string   _signature,
+        bytes    _calldata,
+        uint     _value
+    ) returns (uint id) {
         id = actions();
 
         target        .push(_target);
+        signature     .push(_signature);
         calldata      .push(_calldata);
         value         .push(_value);
         expiration    .push(uint40(now) + window);
@@ -86,7 +91,21 @@ contract DSBasicMultisig is DSBasicMultisigEvents {
         triggered     .push(false);
         succeeded     .push(false);
 
+        // TODO: if signature given, verify against calldata
+
         LogProposed(id);
+    }
+
+    function propose(
+        address target, bytes calldata, uint value
+    ) returns (uint id) {
+        return propose(target, "", calldata, value);
+    }
+
+    function propose(
+        address target, string signature, bytes calldata
+    ) returns (uint id) {
+        return propose(target, signature, calldata, 0);
     }
 
     function propose(address target, bytes calldata) returns (uint id) {
