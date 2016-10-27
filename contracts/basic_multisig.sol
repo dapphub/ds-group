@@ -69,6 +69,7 @@ contract DSBasicMultisig is DSBasicMultisigEvents {
 
     uint40[]   public  expiration;
     uint8[]    public  confirmations;
+    bool[]     public  cancelled;
     bool[]     public  triggered;
     bool[]     public  succeeded;
 
@@ -82,12 +83,14 @@ contract DSBasicMultisig is DSBasicMultisigEvents {
     ) returns (uint id) {
         id = actions();
 
+        proposer      .push(msg.sender);
         target        .push(_target);
         signature     .push(_signature);
         calldata      .push(_calldata);
         value         .push(_value);
         expiration    .push(uint40(now) + window);
         confirmations .push(0);
+        cancelled     .push(false);
         triggered     .push(false);
         succeeded     .push(false);
 
@@ -120,15 +123,18 @@ contract DSBasicMultisig is DSBasicMultisigEvents {
         return propose(target, "", 0);
     }
 
-    //------------------------------------------------------
-    // Confirming and triggering pending actions
-    //------------------------------------------------------
-
     modifier pending(uint id) {
-        assert(id < actions());
-        assert(!expired(id));
+        assert(!cancelled[id]);
         assert(!triggered[id]);
+        assert(!expired(id));
+        assert(id < actions());
         _
+    }
+
+    function cancel(uint id) pending(id) {
+        if (msg.sender == proposer[id]) {
+            cancelled[id] = true;
+        }
     }
 
     function confirm(uint id) pending(id) {
