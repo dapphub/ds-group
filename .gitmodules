@@ -1,6 +1,0 @@
-[submodule "dapple_packages/auth"]
-	path = dapple_packages/auth
-	url = https://github.com/nexusdev/ds-auth
-[submodule "dapple_packages/actor"]
-	path = dapple_packages/actor
-	url = https://github.com/nexusdev/ds-actor
