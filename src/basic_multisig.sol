@@ -62,6 +62,7 @@ contract DSBasicMultisig is DSBasicMultisigEvents {
         return confirmations[id] >= quorum;
     }
 
+    address[]  public  proposer;
     address[]  public  target;
     string[]   public  signature;
     bytes[]    public  calldata;
@@ -128,7 +129,7 @@ contract DSBasicMultisig is DSBasicMultisigEvents {
         assert(!triggered[id]);
         assert(!expired(id));
         assert(id < actions());
-        _
+        _;
     }
 
     function cancel(uint id) pending(id) {
@@ -155,5 +156,8 @@ contract DSBasicMultisig is DSBasicMultisigEvents {
         succeeded[id] = target[id].call.value(value[id])(calldata[id]);
 
         LogTriggered(id);
+    }
+    function() payable {
+        // Accept Ether
     }
 }
