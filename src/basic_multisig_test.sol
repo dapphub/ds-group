@@ -161,7 +161,6 @@ contract DSBasicMultisigTest is Test, DSBasicMultisigEvents {
         assertEq(dummy.balance, 0);
 
         multisig.propose(dummy, 70);
-/*
         multisig.confirm(0);
         alice.confirm(multisig, 0);
         multisig.trigger(0);
@@ -176,7 +175,6 @@ contract DSBasicMultisigTest is Test, DSBasicMultisigEvents {
         assertEq(dummy.balance, 70);
         assertEq(alice.balance, 430);
         assertEq(multisig.balance, 0);
-*/
     }
 
     function testFail_payment() {
