@@ -7,9 +7,11 @@ contract DSBasicMultisigEvents {
 }
 
 contract DSBasicMultisig is DSBasicMultisigEvents {
-    function assert(bool condition) {
+    function assert(bool condition) internal {
         if (!condition) throw;
     }
+
+    function() payable {}
 
     function members() constant returns (uint count) {
         return member.length;
@@ -156,8 +158,5 @@ contract DSBasicMultisig is DSBasicMultisigEvents {
         succeeded[id] = target[id].call.value(value[id])(calldata[id]);
 
         LogTriggered(id);
-    }
-    function() payable {
-        // Accept Ether
     }
 }
