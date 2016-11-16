@@ -1,5 +1,7 @@
 /// basic_multisig.sol -- basic standalone multisig implementation
 
+pragma solidity ^0.4.4;
+
 contract DSBasicMultisigEvents {
     event LogProposed  (uint indexed id);
     event LogConfirmed (uint indexed id, address member);
