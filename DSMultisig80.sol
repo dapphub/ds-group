@@ -160,9 +160,8 @@ contract DSMultisig80 is DSMultisig80Events {
     }
 
     function cancel(uint id) pending(id) {
-        if (msg.sender == proposer[id]) {
-            cancelled[id] = true;
-        }
+        assert(msg.sender == proposer[id]);
+        cancelled[id] = true;
     }
 
     function confirm(uint id) pending(id) {
@@ -176,6 +175,7 @@ contract DSMultisig80 is DSMultisig80Events {
     }
 
     function trigger(uint id) pending(id) {
+        assert(isMember[msg.sender]);
         assert(confirmed(id));
         assert(this.balance >= value[id]);
 
