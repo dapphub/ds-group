@@ -1,9 +1,6 @@
-version: 0.0.1-dev
-tags: []
+name:         ds-multisig
+version:      0
 layout:
-  sol_sources: src
-  build_dir: build
-  packages_directory: .dapple/packages/
-dependencies: {}
-ignore: []
-name: ds-multisig
+  sol_sources:          .
+  build_dir:            .dapple/build
+  packages_directory:   .dapple/packages

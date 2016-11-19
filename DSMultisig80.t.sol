@@ -1,65 +1,66 @@
+/// DSMultisig80.t.sol -- DSMultisig80 tests
+
+// Copyright 2016  Nexus Development, LLC
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// A copy of the License may be obtained at the following URL:
+//
+//    https://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+pragma solidity ^0.4.4;
+
 import "dapple/test.sol";
 
-import "basic_multisig_factory.sol";
+import "DSMultisig80.sol";
 
-contract Dummy {
-    bool _fail;
-    function fail() { _fail = true; }
-
-    bool public fallbackCalled;
-    function() { if (_fail) throw; fallbackCalled = true; }
-
-    uint32 public fooArgument;
-    function foo(uint32 argument) { fooArgument = argument; }
-}
-
-contract Person {
-    function confirm(DSBasicMultisig multisig, uint action) {
-        multisig.confirm(action);
-    }
-}
-
-contract DSBasicMultisigTest is Test, DSBasicMultisigEvents {
-    DSMultisigFactory factory;
-    DSBasicMultisig multisig;
-    Person alice;
-    Person bob;
-    Person eve;
-    Dummy dummy;
+contract DSMultisig80Test is Test, DSMultisig80Events {
+    DSMultisig80Factory  factory;
+    DSMultisig80         multisig;
+    Person               alice;
+    Person               bob;
+    Person               eve;
+    Dummy                dummy;
 
     function setUp() {
-        address[] memory members = new address[](3);
+        address[] memory members  = new address[](3);
         members[0] = this;
         members[1] = alice = new Person();
         members[2] = bob = new Person();
         dummy = new Dummy();
         eve = new Person();
-        factory = new DSMultisigFactory();
-        multisig = factory.createBasicMultisig(members, 2, 24 hours);
+        factory = new DSMultisig80Factory();
+        multisig = factory.newMultisig(members, 2, 24 hours);
         foo(123);
     }
 
     function test_setup() {
-        assertEq(multisig.members(), 3);
-        assertEq(multisig.member(0), this);
-        assertEq(multisig.member(1), alice);
-        assertEq(multisig.member(2), bob);
+        assertEq(multisig.memberCount(), 3);
+        assertEq(multisig.members(0), this);
+        assertEq(multisig.members(1), alice);
+        assertEq(multisig.members(2), bob);
         assertTrue(multisig.isMember(this));
         assertTrue(multisig.isMember(alice));
         assertTrue(multisig.isMember(bob));
         assertFalse(multisig.isMember(eve));
         assertEq(uint(multisig.quorum()), 2);
         assertEq(uint(multisig.window()), 24 hours);
-        assertEq(multisig.actions(), 0);
+        assertEq(multisig.actionCount(), 0);
     }
 
     function test_propose() {
         assertEq(multisig.propose(dummy), 0);
-        assertEq(multisig.actions(), 1);
+        assertEq(multisig.actionCount(), 1);
         assertEq(multisig.target(0), dummy);
         assertEq(multisig.callsize(0), 0);
         assertEq(multisig.value(0), 0);
-        assertEq(uint(multisig.expiration(0)), now + 24 hours);
+        assertEq(uint(multisig.deadline(0)), now + 24 hours);
         assertEq(uint(multisig.confirmations(0)), 0);
         assertFalse(multisig.triggered(0));
         assertFalse(multisig.succeeded(0));
@@ -74,7 +75,7 @@ contract DSBasicMultisigTest is Test, DSBasicMultisigEvents {
     function test_second_propose() {
         assertEq(multisig.propose(dummy), 0);
         assertEq(multisig.propose(alice), 1);
-        assertEq(multisig.actions(), 2);
+        assertEq(multisig.actionCount(), 2);
         assertEq(multisig.target(0), dummy);
         assertEq(multisig.target(1), alice);
     }
@@ -148,7 +149,7 @@ contract DSBasicMultisigTest is Test, DSBasicMultisigEvents {
         multisig.propose(dummy);
         multisig.confirm(0);
         alice.confirm(multisig, 0);
-        dummy.fail();
+        dummy.setWillFail(true);
         multisig.trigger(0);
         assertTrue(multisig.triggered(0));
         assertFalse(multisig.succeeded(0));
@@ -156,7 +157,7 @@ contract DSBasicMultisigTest is Test, DSBasicMultisigEvents {
     }
 
     function test_payment() {
-        assertTrue(multisig.call.value(500)());
+        assertTrue(multisig.send(500));
         assertEq(multisig.balance, 500);
         assertEq(dummy.balance, 0);
 
@@ -223,5 +224,33 @@ contract DSBasicMultisigTest is Test, DSBasicMultisigEvents {
         alice.confirm(multisig, 0);
         multisig.trigger(0);
         assertEq(uint(dummy.fooArgument()), 123);
+    }
+}
+
+contract Dummy {
+    bool    public  willFail;
+    bool    public  fallbackCalled;
+    uint32  public  fooArgument;
+
+    function setWillFail(bool value) {
+        willFail = value;
+    }
+
+    function () payable {
+        if (willFail) {
+            throw;
+        } else {
+            fallbackCalled = true;
+        }
+    }
+
+    function foo(uint32 argument) {
+        fooArgument = argument;
+    }
+}
+
+contract Person {
+    function confirm(DSMultisig80 multisig, uint action) {
+        multisig.confirm(action);
     }
 }

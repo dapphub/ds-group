@@ -1,1 +1,1 @@
-test:; dapple test --report
+test:; dapple test
