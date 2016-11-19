@@ -17,10 +17,10 @@
 pragma solidity ^0.4.4;
 
 contract DSMultisig80Events {
-    event LogProposed  (uint indexed id);
-    event LogConfirmed (uint indexed id, address member);
-    event LogCancelled (uint indexed id);
-    event LogTriggered (uint indexed id);
+    event LogPropose    (uint indexed id);
+    event LogConfirm    (uint indexed id, address member);
+    event LogCancel     (uint indexed id);
+    event LogTrigger    (uint indexed id);
 }
 
 contract DSMultisig80 is DSMultisig80Events {
@@ -94,7 +94,7 @@ contract DSMultisig80 is DSMultisig80Events {
 
         // TODO: If signature given, verify against calldata
 
-        LogProposed(id);
+        LogPropose(id);
     }
 
     function () payable {
@@ -162,7 +162,7 @@ contract DSMultisig80 is DSMultisig80Events {
         confirmations[id]++;
         confirmedBy[id][msg.sender] = true;
 
-        LogConfirmed(id, msg.sender);
+        LogConfirm(id, msg.sender);
     }
 
     function trigger(uint id) pending(id) {
@@ -172,7 +172,7 @@ contract DSMultisig80 is DSMultisig80Events {
         triggered[id] = true;
         succeeded[id] = target[id].call.value(value[id])(calldata[id]);
 
-        LogTriggered(id);
+        LogTrigger(id);
     }
 
     function assert(bool condition) internal {

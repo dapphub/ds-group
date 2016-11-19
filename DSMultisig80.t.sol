@@ -193,10 +193,10 @@ contract DSMultisig80Test is Test, DSMultisig80Events {
         this.foo(123456789);
 
         expectEventsExact(multisig);
-        LogProposed(0);
-        LogConfirmed(0, this);
-        LogConfirmed(0, alice);
-        LogTriggered(0);
+        LogPropose(0);
+        LogConfirm(0, this);
+        LogConfirm(0, alice);
+        LogTrigger(0);
 
         multisig.propose(dummy, expectedData);
         assertEq32(multisig.callhash(0), sha3(expectedData));
@@ -250,6 +250,8 @@ contract Dummy {
 }
 
 contract Person {
+    function () payable {}
+
     function confirm(DSMultisig80 multisig, uint action) {
         multisig.confirm(action);
     }
