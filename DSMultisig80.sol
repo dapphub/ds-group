@@ -21,6 +21,7 @@ contract DSMultisig80Events {
     event LogConfirm    (uint indexed id, address member);
     event LogCancel     (uint indexed id);
     event LogTrigger    (uint indexed id);
+    event LogSetComment (uint indexed id);
 }
 
 contract DSMultisig80 is DSMultisig80Events {
@@ -139,6 +140,15 @@ contract DSMultisig80 is DSMultisig80Events {
 
     function propose(address target) returns (uint id) {
         return propose(target, "", 0);
+    }
+
+    function setComment(uint id, string value) {
+        assert(isMember[msg.sender]);
+        assert(id < actionCount());
+
+        comment[id] = value;
+
+        LogSetComment(id);
     }
 
     modifier pending(uint id) {
