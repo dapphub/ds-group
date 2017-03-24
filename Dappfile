@@ -1,6 +1,6 @@
-name:         ds-multisig
-version:      0
-layout:
-  sol_sources:          .
-  build_dir:            .dapple/build
-  packages_directory:   .dapple/packages
+name            ds-multisig
+description
+version         0.0.1
+
+author          amilenius
+license         Apache-2.0
