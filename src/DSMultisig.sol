@@ -16,7 +16,7 @@
 
 pragma solidity ^0.4.4;
 
-contract DSMultisig80Events {
+contract DSMultisigEvents {
     event LogPropose    (uint indexed id);
     event LogConfirm    (uint indexed id, address member);
     event LogCancel     (uint indexed id);
@@ -24,7 +24,7 @@ contract DSMultisig80Events {
     event LogSetComment (uint indexed id);
 }
 
-contract DSMultisig80 is DSMultisig80Events {
+contract DSMultisig is DSMultisigEvents {
     function memberCount() constant returns (uint count) {
         return members.length;
     }
@@ -35,7 +35,7 @@ contract DSMultisig80 is DSMultisig80Events {
 
     mapping (address => bool)  public  isMember;
 
-    function DSMultisig80(
+    function DSMultisig(
         address[] _members,
         uint8     _quorum,
         uint      _window
@@ -192,7 +192,7 @@ contract DSMultisig80 is DSMultisig80Events {
     }
 }
 
-contract DSMultisig80Factory {
+contract DSMultisigFactory {
     address[]                  public  multisigs;
     mapping (address => bool)  public  isMultisig;
 
@@ -202,8 +202,8 @@ contract DSMultisig80Factory {
 
     function newMultisig(
         address[] members, uint8 quorum, uint window
-    ) returns (DSMultisig80 result) {
-        result = new DSMultisig80(members, quorum, window);
+    ) returns (DSMultisig result) {
+        result = new DSMultisig(members, quorum, window);
         multisigs.push(result);
         isMultisig[result] = true;
     }

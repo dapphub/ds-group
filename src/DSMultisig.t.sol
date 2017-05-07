@@ -1,4 +1,4 @@
-/// DSMultisig80.t.sol -- DSMultisig80 tests
+/// DSMultisig.t.sol -- DSMultisig tests
 
 // Copyright 2016, 2017  DappHub, LLC
 //
@@ -18,11 +18,11 @@ pragma solidity ^0.4.4;
 
 import "ds-test/test.sol";
 
-import "./DSMultisig80.sol";
+import "./DSMultisig.sol";
 
-contract DSMultisig80Test is DSTest, DSMultisig80Events {
-    DSMultisig80Factory  factory;
-    DSMultisig80         multisig;
+contract DSMultisigTest is DSTest, DSMultisigEvents {
+    DSMultisigFactory  factory;
+    DSMultisig         multisig;
     Person               alice;
     Person               bob;
     Person               eve;
@@ -35,7 +35,7 @@ contract DSMultisig80Test is DSTest, DSMultisig80Events {
         members[2] = bob = new Person();
         dummy = new Dummy();
         eve = new Person();
-        factory = new DSMultisig80Factory();
+        factory = new DSMultisigFactory();
         multisig = factory.newMultisig(members, 2, 24 hours);
         foo(123);
     }
@@ -252,7 +252,7 @@ contract Dummy {
 contract Person {
     function () payable {}
 
-    function confirm(DSMultisig80 multisig, uint action) {
+    function confirm(DSMultisig multisig, uint action) {
         multisig.confirm(action);
     }
 }
