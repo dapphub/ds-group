@@ -18,7 +18,7 @@ pragma solidity ^0.4.4;
 
 import "ds-test/test.sol";
 
-import "./DSMultisig.sol";
+import "./multisig.sol";
 
 contract DSMultisigTest is DSTest, DSMultisigEvents {
     DSMultisigFactory  factory;
