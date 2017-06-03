@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+### ds-group-ls -- list already-proposed multisig actions
+### Usage: ds-group ls [-a] <group>
+set -e
+
+group=${1?which group?}
+info=$(ds-group info "$group")
+quorum=$(seth --field quorum <<<"$info")
+admins=$(seth --field admins <<<"$info")
+actions=$(seth --field actions <<<"$info")
+
+export DS_GROUP_QUORUM=$quorum
+
+shift
+for id; do if [[ $id = -a ]]; then all=1; else ids+=("$id"); fi; done
+if [[ ${#ids[*]} = 0 ]]; then ids=($(seq "$actions")); else all=1; fi
+
+printf "%7s\t%14s\t%14s\t%s\n" \
+ACTION CONFIRMATIONS EXPIRATION STATUS
+
+display-action() {
+  action=$(ds-group action "$group" "$id")
+  expired=$(seth --field expired <<<"$action")
+  if [[ ! $all && $expired = true ]]; then return; fi
+  expiration=$(seth --field expiration <<<"$action")
+  confirmations=$(seth --field confirmations <<<"$action")
+  status=$(seth --field status <<<"$action")
+  printf "%7s\t%14s\t%14s\t%s\n" "$1" \
+    "$confirmations/$admins (need $quorum)" \
+    "$(pretty-date "$expiration")" "$status"
+}
+
+pretty-date() {
+  if (($(date +%s) < $1)); then
+    seconds=$(($1 - $(date +%s)))
+    if ((seconds > 3600)); then
+      echo "$((seconds / 60 / 60)) h left"
+    else
+      echo "$((seconds / 60)) min left"
+    fi
+  elif [[ $(date -d "@$1" +%Y) = $(date +%Y) ]]; then
+    date -d "@$expiration" +"%b %d %H:%M"
+  else
+    date -d "@$expiration" +"%b %d %Y"
+  fi
+}
+
+for id; do display-action "$id" & done | sort -n

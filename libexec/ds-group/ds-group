@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+### ds-group -- command-line interface for DSGroup
+### Usage: ds-group <command> <group> [<args>]
+###    or: ds-group <command> --help
+
+set -e
+
+if [[ $2 = --help ]]; then
+  exec ds-group-help "$1"
+elif [[ ${1-help} = help ]]; then
+  exec ds-group-"${1-help}" "${@:2}"
+fi
+
+ds-group-"$1" "${@:2}"

@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+### ds-group-trigger -- trigger a confirmed multisig action
+### Usage: ds-group trigger <group> <action>
+set -e
+fail() { echo >&2 "${0##*/}: $*"; exit 1; }
+
+group=${1?which group?}
+id=${2?which action?}
+
+info=$(ds-group action "$group" "$id")
+get() { seth --field "$1" <<<"$info"; }
+
+if [[ $(get expired) = true ]]; then
+  fail "error: action $id expired"
+elif [[ $(get confirmed) = false ]]; then
+  fail "error: action $id not confirmed"
+elif [[ $(get triggered) = true ]]; then
+  fail "error: action $id already triggered"
+fi
+
+echo "Triggering action $id..."
+seth send "$group" "trigger(uint)" "$id"
+
+info=$(ds-group action "$group" "$id")
+
+if [[ $(get triggered) = true ]]; then
+  echo "Action $id successfully triggered."
+else
+  fail "failed to trigger action $id"
+fi

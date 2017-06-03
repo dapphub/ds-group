@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+### ds-group-propose -- propose a new multisig action
+### Usage: ds-group propose <group> <target> <value> <sig> [<args>]
+###    or: ds-group propose <group> <target> <value> <data>
+###
+### Submit a proposal for <group> to call <target> with <value> and <data>.
+### If <sig> has the form `<name>(<types>)', then infer <data> from <args>.
+set -e
+[[ $4 ]] || { ds-group propose --help; exit 1; }
+
+group=$(seth --to-address "${1?which group?}")
+target=$(seth --to-address "${2?which target?}")
+value=${3?how much ETH?}
+calldata=$(seth calldata "${@:3}")
+
+echo >&2 "Proposing action..."
+echo >&2 "  target     $target"
+echo >&2 "  value      $value"
+echo >&2 "  calldata   $calldata"
+
+sig="propose(address,bytes,uint256)(uint)"
+seth send "$group" "$sig" "${target#0x}" "${calldata#0x}" "$value"
+echo "Successfully proposed action."

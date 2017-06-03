@@ -1,6 +1,7 @@
-name            ds-multisig
-description
-version         0.0.1
+name            ds-group
+description     Simple m-of-n multisig
+version         2
 
-author          amilenius
+author          Ryan Casey <ryepdx@gmail.com>
+author          Daniel Brockman <daniel@brockman.se>
 license         Apache-2.0

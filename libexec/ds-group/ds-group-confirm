@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+### ds-group-confirm -- confirm a proposed multisig action
+### Usage: ds-group confirm <group> <action>
+set -e
+fail() { echo >&2 "${0##*/}: $*"; exit 1; }
+echo "Confirming action ${2?which action?}..."
+
+seth send "${1?which group?}" "confirm(uint256)(bool)" "$2" ||
+fail "error: failed to confirm action $2"
+
+echo "Successfully confirmed action $2."

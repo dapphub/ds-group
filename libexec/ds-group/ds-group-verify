@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+### ds-group-verify -- verify the meaning of a multisig action
+### Usage: ds-group verify <group> <tx> <target> <value> <sig> [<args>]
+###    or: ds-group verify <group> <tx> <target> <value> <data>
+###
+### Verify <tx> proposing <group> to call <target> with <value> and <data>.
+### If <sig> has the form `<name>(<types>)', infer <data> from <args>.
+set -e
+fail() { echo >&2 "${0##*/}: $*"; exit 1; }
+[[ $5 ]] || { ds-group verify --help; exit 1; }
+
+group=${1?which group?}
+tx=${2?which transaction?}
+target=$(seth --to-address "${3?which target?}")
+target=${target#0x}
+value=${4?how much ETH?}
+calldata=$(seth calldata "${@:4}")
+calldata=${calldata#0x}
+inner_sig=${5?what calldata?}
+
+actual_group=$(seth tx "$tx" to)
+[[ $actual_group = "$group" ]] || fail "error: wrong group: $actual_group"
+
+actual=$(seth tx "$tx" input)
+actual=${actual#0x}
+
+sig="propose(address,bytes,uint256)"
+expected=$(seth calldata "$sig" "$target" "$calldata" "$value")
+expected=${expected#0x}
+
+explain() {
+  hash=$(seth calldata "$1")
+  hash=${hash#0x}
+  if [[ $hash = '' ]]; then
+    cat
+  else
+    sed "s/$hash/$hash # $1/"
+  fi
+}
+
+format() {
+  printf %s\\n "${1:0:8}" "${1:8:264}" "${1:272}" | fold -w64 |
+  explain "$sig" | explain "$inner_sig"
+}
+
+actual=$(format "$actual")
+expected=$(format "$expected")
+
+diff -U9999 <(echo "$expected") <(echo "$actual") ||
+fail "error: transaction does not match expected calldata"
+
+echo "$actual"
+echo "Transaction matches expected calldata."

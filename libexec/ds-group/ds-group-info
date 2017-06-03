@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -e
+values=$(seth call "${1?which group?}" "getInfo()(uint,uint,uint,uint)")
+values=($(seth --to-dec <<<"$values"))
+for name in quorum admins window actions; do  
+  printf "%-15s\t%s\n" "$name" "${values[$((i++))]}"
+done

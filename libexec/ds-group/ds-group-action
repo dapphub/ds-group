@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+### ds-group-action -- print information about a multisig action
+### Usage: ds-group action <group> <action>
+set -e
+group=${1?which group?}
+action=${2?which action?}
+
+sig="getActionStatus(uint256)(uint256,uint256,bool,address,uint256)"
+values=($(seth call "$group" "$sig" "$action"))
+
+confirmations=$(seth --to-dec "${values[0]}")
+deadline=$(seth --to-dec "${values[1]}")
+triggered=${values[2]}
+
+target=$(seth --to-address "${values[3]}")
+value=$(seth --to-dec "${values[4]}")
+
+if (($(date +%s) >= deadline)); then
+  expired=true
+else
+  expired=false
+fi
+
+quorum=${DS_GROUP_QUORUM-$(ds-group info "$group" | seth --field quorum)}
+if ((confirmations >= quorum)); then
+  confirmed=true
+else
+  confirmed=false
+fi
+
+if [[ $triggered = true ]]; then
+  status=Triggered
+elif [[ $expired = true ]]; then
+  status=Expired
+elif [[ $confirmed = true ]]; then
+  status=Untriggered
+else
+  status=Unconfirmed
+fi
+
+: "$target" "$value" "$status"
+
+if [[ $deadline = 0 ]]; then
+  echo >&2 "${0##*/}: error: no such action: $1"
+  exit 1
+else
+  properties=(
+    confirmations
+    confirmed
+    deadline
+    expired
+    status
+    target
+    triggered
+    value
+  )
+  for name in "${properties[@]}"; do
+    printf "%-15s\t%s\n" "$name" "${!name}"
+  done
+fi
