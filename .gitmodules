@@ -4,3 +4,6 @@
 [submodule "lib/ds-exec"]
 	path = lib/ds-exec
 	url = https://github.com/dapphub/ds-exec
+[submodule "lib/ds-note"]
+	path = lib/ds-note
+	url = https://github.com/dapphub/ds-note
