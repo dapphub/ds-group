@@ -14,7 +14,7 @@ tx=${2?which transaction?}
 target=$(seth --to-address "${3?which target?}")
 target=${target#0x}
 value=${4?how much ETH?}
-calldata=$(seth calldata "${@:4}")
+calldata=$(seth calldata "${@:5}")
 calldata=${calldata#0x}
 inner_sig=${5?what calldata?}
 
