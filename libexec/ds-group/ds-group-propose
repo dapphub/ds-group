@@ -11,7 +11,7 @@ set -e
 group=$(seth --to-address "${1?which group?}")
 target=$(seth --to-address "${2?which target?}")
 value=${3?how much ETH?}
-calldata=$(seth calldata "${@:3}")
+calldata=$(seth calldata "${@:4}")
 
 echo >&2 "Proposing action..."
 echo >&2 "  target     $target"
