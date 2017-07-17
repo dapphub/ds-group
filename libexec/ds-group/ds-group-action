@@ -2,6 +2,8 @@
 ### ds-group-action -- print information about a multisig action
 ### Usage: ds-group action <group> <action>
 set -e
+[[ $2 ]] || { ds-group action --help; exit 1; }
+
 group=${1?which group?}
 action=${2?which action?}
 

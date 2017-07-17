@@ -2,6 +2,8 @@
 ### ds-group-trigger -- trigger a confirmed multisig action
 ### Usage: ds-group trigger <group> <action>
 set -e
+[[ $2 ]] || { ds-group trigger --help; exit 1; }
+
 fail() { echo >&2 "${0##*/}: $*"; exit 1; }
 
 group=${1?which group?}

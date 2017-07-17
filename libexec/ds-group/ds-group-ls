@@ -2,6 +2,7 @@
 ### ds-group-ls -- list already-proposed multisig actions
 ### Usage: ds-group ls [-a] <group>
 set -e
+[[ $1 ]] || { ds-group ls --help; exit 1; }
 
 group=${1?which group?}
 info=$(ds-group info "$group")
