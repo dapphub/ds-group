@@ -14,9 +14,8 @@ actions=$(seth --field actions <<<"$info")
 
 export DS_GROUP_QUORUM=$quorum
 
-shift
-for id; do ids+=("$id"); done
-if [[ ${#ids[*]} = 0 ]] && [[ "$actions" -gt 0 ]]; then ids=($(seq "$actions")); else all=1; fi
+ids="${*:2}"
+if [[ -z "$ids" ]] && [[ "$actions" -gt 0 ]]; then ids=$(seq "$actions"); else all=1; fi
 
 printf "%7s\t%14s\t%14s\t%s\n" \
 ACTION CONFIRMATIONS EXPIRATION STATUS
@@ -48,7 +47,4 @@ pretty-date() {
   fi
 }
 
-if [[ ${#ids[*]} -gt 0 ]];
-then
-  for id in "$ids"; do display-action "$id" & done | sort -n
-fi
+for id in $ids; do display-action "$id" & done | sort -n
