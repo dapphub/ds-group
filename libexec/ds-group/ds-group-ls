@@ -15,7 +15,7 @@ export DS_GROUP_QUORUM=$quorum
 
 shift
 for id; do ids+=("$id"); done
-if [[ ${#ids[*]} = 0 ]]; then ids=($(seq "$actions")); else all=1; fi
+if [[ ${#ids[*]} = 0 ]] && [[ "$actions" -gt 0 ]]; then ids=($(seq "$actions")); else all=1; fi
 
 printf "%7s\t%14s\t%14s\t%s\n" \
 ACTION CONFIRMATIONS EXPIRATION STATUS
@@ -47,4 +47,7 @@ pretty-date() {
   fi
 }
 
-for id in "$ids"; do display-action "$id" & done | sort -n
+if [[ ${#ids[*]} -gt 0 ]];
+then
+  for id in "$ids"; do display-action "$id" & done | sort -n
+fi
