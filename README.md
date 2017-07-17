@@ -7,6 +7,34 @@ command-line interface for working with such multisig instances.
 Please join <https://dapphub.chat/> for more information.
 
 
+Multisig contract deployment
+============================
+
+The `DSGroup` contract takes three parameters:
+
+```
+    function DSGroup(
+        address[]  members_,
+        uint       quorum_,
+        uint       window_
+    ) { … }
+```
+
+- `address[] members_` is the list of group members. They will be able
+  to create new proposals, accept them and trigger their execution.
+- `uint quorum_` is the minimum number of members who have to accept
+  a proposal before it can be triggered.
+- `uint window_` is the proposal validity time in seconds.
+
+Use Dapp (<https://github.com/dapphub/dapp>) to build and deploy
+the contract:
+
+```bash
+dapp build
+dapp deploy DSGroup '[0011111111111111111111111111111111111111,0022222222222222222222222222222222222222,0033333333333333333333333333333333333333]' 2 86400
+```
+
+
 Command-line interface
 ======================
 
