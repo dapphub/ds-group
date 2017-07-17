@@ -12,6 +12,7 @@ values=($(seth call "$group" "$sig" "$action"))
 
 confirmations=$(seth --to-dec "${values[0]}")
 deadline=$(seth --to-dec "${values[1]}")
+deadlineUtc="$(date -d "@$deadline" -u)"
 triggered=${values[2]}
 
 target=$(seth --to-address "${values[3]}")
@@ -50,6 +51,7 @@ else
     confirmations
     confirmed
     deadline
+    deadlineUtc
     expired
     status
     target
