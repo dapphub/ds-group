@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 name=${0##*/} name=${name%-help} file=${0%/*}/$name${1+-$1}
-header=$(grep -oP '^(\S)\1\1( \K.*)?' "$file" | perl -pe 's/^(\S)\1\1$//')
+header=$(perl -ne 'print "$2\n" if /^(\S)\1\1(?: (.*))?/' "$file")
 
 if ! [[ $header ]]; then
   sed "s/^/${0##*/}: /" "$file"
@@ -20,8 +20,9 @@ if ! [[ $1 ]]; then
   done
 
   list-commands() {
-    grep -hoP "^(\\S)\\1\\1 $name-\\K[^ ]* -- .*" "$@" |
-    sed "s/ -- / /" | while read -r name label; do
+    cat "$@" |
+    perl -ne 'print "$2 $3\n" if /^(\S)\1\1 '"$name"'-(\S+) -- (.*)/' |
+    while read -r name label; do
       printf "   %-12s  %s\n" "$name" "$label"
     done | LANG=C sort
   }
