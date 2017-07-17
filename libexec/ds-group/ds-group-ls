@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 ### ds-group-ls -- list already-proposed multisig actions
-### Usage: ds-group ls [-a] <group>
+### Usage: ds-group ls [-a] <group> [id1 id2 ...]
 set -e
 
 if [[ $1 == -a ]]; then all=1; shift; fi
