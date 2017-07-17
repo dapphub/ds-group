@@ -3,6 +3,8 @@
 ### Usage: ds-group ls [-a] <group>
 set -e
 
+if [[ $1 == -a ]]; then all=1; shift; fi
+
 group=${1?which group?}
 info=$(ds-group info "$group")
 quorum=$(seth --field quorum <<<"$info")
@@ -12,7 +14,7 @@ actions=$(seth --field actions <<<"$info")
 export DS_GROUP_QUORUM=$quorum
 
 shift
-for id; do if [[ $id = -a ]]; then all=1; else ids+=("$id"); fi; done
+for id; do ids+=("$id"); done
 if [[ ${#ids[*]} = 0 ]]; then ids=($(seq "$actions")); else all=1; fi
 
 printf "%7s\t%14s\t%14s\t%s\n" \
@@ -22,12 +24,12 @@ display-action() {
   action=$(ds-group action "$group" "$id")
   expired=$(seth --field expired <<<"$action")
   if [[ ! $all && $expired = true ]]; then return; fi
-  expiration=$(seth --field expiration <<<"$action")
+  deadline=$(seth --field deadline <<<"$action")
   confirmations=$(seth --field confirmations <<<"$action")
   status=$(seth --field status <<<"$action")
   printf "%7s\t%14s\t%14s\t%s\n" "$1" \
     "$confirmations/$admins (need $quorum)" \
-    "$(pretty-date "$expiration")" "$status"
+    "$(pretty-date "$deadline")" "$status"
 }
 
 pretty-date() {
@@ -39,10 +41,10 @@ pretty-date() {
       echo "$((seconds / 60)) min left"
     fi
   elif [[ $(date -d "@$1" +%Y) = $(date +%Y) ]]; then
-    date -d "@$expiration" +"%b %d %H:%M"
+    date -d "@$deadline" +"%b %d %H:%M"
   else
-    date -d "@$expiration" +"%b %d %Y"
+    date -d "@$deadline" +"%b %d %Y"
   fi
 }
 
-for id; do display-action "$id" & done | sort -n
+for id in "$ids"; do display-action "$id" & done | sort -n
