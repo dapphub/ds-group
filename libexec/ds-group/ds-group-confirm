@@ -2,6 +2,8 @@
 ### ds-group-confirm -- confirm a proposed multisig action
 ### Usage: ds-group confirm <group> <action>
 set -e
+[[ $2 ]] || { ds-group confirm --help; exit 1; }
+
 fail() { echo >&2 "${0##*/}: $*"; exit 1; }
 echo "Confirming action ${2?which action?}..."
 
