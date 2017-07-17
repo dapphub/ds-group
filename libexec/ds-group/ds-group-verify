@@ -6,8 +6,9 @@
 ### Verify <tx> proposing <group> to call <target> with <value> and <data>.
 ### If <sig> has the form `<name>(<types>)', infer <data> from <args>.
 set -e
-fail() { echo >&2 "${0##*/}: $*"; exit 1; }
 [[ $5 ]] || { ds-group verify --help; exit 1; }
+
+fail() { echo >&2 "${0##*/}: $*"; exit 1; }
 
 group=${1?which group?}
 tx=${2?which transaction?}
