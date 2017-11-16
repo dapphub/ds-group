@@ -23,11 +23,14 @@ function DSGroup(
 ) { … }
 ```
 
-- `address[] members_` is the list of group members. They will be able
-  to create new proposals, accept them and trigger their execution.
-- `uint quorum_` is the minimum number of members who have to accept
-  a proposal before it can be triggered.
-- `uint window_` is the proposal validity time in seconds.
+#### `address[] members_` 
+The list of group members. They will be able to create new proposals, accept them and trigger their execution.
+
+#### `uint quorum_` 
+The minimum number of members who have to accept a proposal before it can be triggered.
+
+#### `uint window_` 
+The proposal validity time in seconds.
 
 Install [Dapp](https://dapp.tools/dapp/) to build and deploy the contract:
 
@@ -74,7 +77,7 @@ Proposing action...
 seth-send: 0x307b667c434794c234b7c463b26827bdceb9c838fdb306f3f4398edefa5b1310
 seth-send: Waiting for transaction receipt.........................
 seth-send: Transaction included in block 1519991.
-seth-send: note: return value may be inaccurate (see `seth send --help')
+seth-send: note: return value may be inaccurate (see 'seth send --help')
 Successfully proposed act 17.
 
 ~$ ds-group ls @mkrgroup
