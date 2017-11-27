@@ -1,12 +1,8 @@
-<h2>DSMultisig
-  <small class="text-muted">
-    <a href="https://github.com/dapphub/ds-multisig"><span class="fa fa-github"></span></a>
-  </small>
-</h2>
+<h2>DSGroup</h2>
 
 _Multisig with a command-line interface_
 
-The ds-multisig library is `DSGroup` with a command-line interface. A list of 
+The ds-group library is `DSGroup` with a command-line interface. A list of 
 `members`, the required `quorum` and the `window` of time in which actions
 must be approved are fixed when the `DSGroup` contract is created. Actions can 
 then be proposed, confirmed and triggered once a group quorum has been reached.
@@ -16,35 +12,31 @@ then be proposed, confirmed and triggered once a group quorum has been reached.
 The `DSGroup` contract takes three parameters:
 
 ```
-function DSGroup(
-    address[]  members_,
-    uint       quorum_,
-    uint       window_
-) { … }
+function DSGroup(address[] members, uint quorum, uint window)
 ```
 
-#### `address[] members_` 
+#### `address[] members` 
 The list of group members. They will be able to create new proposals, accept them and trigger their execution.
 
-#### `uint quorum_` 
+#### `uint quorum` 
 The minimum number of members who have to accept a proposal before it can be triggered.
 
-#### `uint window_` 
+#### `uint window` 
 The proposal validity time in seconds.
 
 Install [Dapp](https://dapp.tools/dapp/) to build and deploy the contract:
 
 ```bash
 dapp build
-dapp deploy DSGroup '[
-  0011111111111111111111111111111111111111, \
-  0022222222222222222222222222222222222222, \
-  0033333333333333333333333333333333333333  \
+dapp create DSGroup '[
+  0011111111111111111111111111111111111111,
+  0022222222222222222222222222222222222222,
+  0033333333333333333333333333333333333333
 ]' 2 86400
 ```
 
 Install the [Seth](https://dapp.tools/seth/) dependency in order to use the 
-command line interface. Then type `make` from the ds-multisig directory 
+command line interface. Then type `make link` from the ds-group directory 
 to install the `ds-group` CLI tool:
 
 ```bash
@@ -77,7 +69,7 @@ Proposing action...
 seth-send: 0x307b667c434794c234b7c463b26827bdceb9c838fdb306f3f4398edefa5b1310
 seth-send: Waiting for transaction receipt.........................
 seth-send: Transaction included in block 1519991.
-seth-send: note: return value may be inaccurate (see 'seth send --help')
+seth-send: note: return value may be inaccurate (see `seth send --help')
 Successfully proposed act 17.
 
 ~$ ds-group ls @mkrgroup
