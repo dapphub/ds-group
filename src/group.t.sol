@@ -25,7 +25,7 @@ contract DSGroupTest is DSTest {
     Person          eve;
     bytes           calldata;
 
-    function setUp() {
+    function setUp() public {
         factory = new DSGroupFactory();
         dummy = new Dummy();
         alice = new Person();
@@ -40,7 +40,7 @@ contract DSGroupTest is DSTest {
         group = factory.newGroup(members, 2, 3 days);
     }
 
-    function test_setup() {
+    function test_setup() public {
         assertEq(group.members(0), alice);
         assertEq(group.members(1), bob);
         assertEq(group.members(2), this);
@@ -62,28 +62,28 @@ contract DSGroupTest is DSTest {
         assertEq(actionCount, 0);
     }
 
-    function testFail_unconfirmed() {
+    function testFail_unconfirmed() public {
         var id = group.propose(dummy, new bytes(0), 0);
         group.trigger(id);
     }
 
-    function testFail_transfer() {
+    function testFail_transfer() public {
         var id = group.propose(dummy, new bytes(0), 123);
         group.confirm(id);
         bob.confirm(group, id);
         group.trigger(id);
     }
 
-    function test_transfer() {
+    function test_transfer() public {
         group.deposit.value(123)();
         var id = group.propose(dummy, new bytes(0), 123);
         group.confirm(id);
         bob.confirm(group, id);
         group.trigger(id);
-        assertEq(dummy.balance, 123);
+        assertEq(address(dummy).balance, 123);
     }
 
-    function test_propose() {
+    function test_propose() public {
         assertEq(group.propose(dummy, new bytes(0), 0), 1);
         assertEq(group.actionCount(), 1);
         assertEq(group.target(1), dummy);
@@ -99,7 +99,7 @@ contract DSGroupTest is DSTest {
         assert(!group.confirmedBy(1, eve));
     }
 
-    function test_second_propose() {
+    function test_second_propose() public {
         assertEq(group.propose(dummy, new bytes(0), 0), 1);
         assertEq(group.propose(alice, new bytes(0), 0), 2);
         assertEq(group.actionCount(), 2);
@@ -107,7 +107,7 @@ contract DSGroupTest is DSTest {
         assertEq(group.target(2), alice);
     }
 
-    function test_confirm() {
+    function test_confirm() public {
         group.propose(dummy, new bytes(0), 0);
         group.confirm(1);
         assertEq(group.confirmations(1), 1);
@@ -119,7 +119,7 @@ contract DSGroupTest is DSTest {
         assert(!group.triggered(1));
     }
 
-    function test_second_confirm() {
+    function test_second_confirm() public {
         group.propose(dummy, new bytes(0), 0);
         group.confirm(1);
         alice.confirm(group, 1);
@@ -130,7 +130,7 @@ contract DSGroupTest is DSTest {
         assert(!group.triggered(1));
     }
 
-    function test_third_confirm() {
+    function test_third_confirm() public {
         group.propose(dummy, new bytes(0), 0);
         group.confirm(1);
         alice.confirm(group, 1);
@@ -141,24 +141,24 @@ contract DSGroupTest is DSTest {
         assert(!group.triggered(1));
     }
 
-    function testFail_double_confirm() {
+    function testFail_double_confirm() public {
         group.propose(dummy, new bytes(0), 0);
         group.confirm(1);
         group.confirm(1);
     }
 
-    function testFail_unauthorized_confirm() {
+    function testFail_unauthorized_confirm() public {
         group.propose(dummy, new bytes(0), 0);
         eve.confirm(group, 1);
     }
 
-    function testFail_premature_trigger() {
+    function testFail_premature_trigger() public {
         group.propose(dummy, new bytes(0), 0);
         group.confirm(1);
         group.trigger(1);
     }
 
-    function test_trigger() {
+    function test_trigger() public {
         group.propose(dummy, new bytes(0), 0);
         group.confirm(1);
         alice.confirm(group, 1);
@@ -168,7 +168,7 @@ contract DSGroupTest is DSTest {
         assert(dummy.fallbackCalled());
     }
 
-    function test_failed_trigger() {
+    function test_failed_trigger() public {
         group.propose(dummy, new bytes(0), 0);
         group.confirm(1);
         alice.confirm(group, 1);
@@ -178,29 +178,29 @@ contract DSGroupTest is DSTest {
         assert(!dummy.fallbackCalled());
     }
 
-    function test_payment() {
+    function test_payment() public {
         group.deposit.value(500)();
-        assertEq(group.balance, 500);
-        assertEq(dummy.balance, 0);
+        assertEq(address(group).balance, 500);
+        assertEq(address(dummy).balance, 0);
 
         group.propose(dummy, new bytes(0), 70);
         group.confirm(1);
         alice.confirm(group, 1);
         group.trigger(1);
-        assertEq(dummy.balance, 70);
-        assertEq(alice.balance, 0);
-        assertEq(group.balance, 430);
+        assertEq(address(dummy).balance, 70);
+        assertEq(address(alice).balance, 0);
+        assertEq(address(group).balance, 430);
 
         group.propose(alice, new bytes(0), 430);
         group.confirm(2);
         alice.confirm(group, 2);
         group.trigger(2);
-        assertEq(dummy.balance, 70);
-        assertEq(alice.balance, 430);
-        assertEq(group.balance, 0);
+        assertEq(address(dummy).balance, 70);
+        assertEq(address(alice).balance, 430);
+        assertEq(address(group).balance, 0);
     }
 
-    function testFail_payment() {
+    function testFail_payment() public {
         assert(group.call.value(500)());
         group.propose(dummy, new bytes(0), 501);
         group.confirm(0);
@@ -208,7 +208,7 @@ contract DSGroupTest is DSTest {
         group.trigger(0);
     }
 
-    function test_calldata() {
+    function test_calldata() public {
         bytes memory calldata = new bytes(4 + 32);
         bytes4 sig = bytes4(sha3("foo(uint256)"));
 
@@ -232,7 +232,7 @@ contract Dummy {
     bool  public  fallbackBlocked;
     bool  public  fallbackCalled;
 
-    function () payable {
+    function () payable public {
         if (fallbackBlocked) {
             throw;
         } else {
@@ -240,20 +240,20 @@ contract Dummy {
         }
     }
 
-    function setFallbackBlocked(bool yes) {
+    function setFallbackBlocked(bool yes) public {
         fallbackBlocked = yes;
     }
 
-    function foo(uint argument) payable {
+    function foo(uint argument) payable public {
         fooArgument  = argument;
         fooValue     = msg.value;
     }
 }
 
 contract Person {
-    function () payable {}
+    function () payable public {}
 
-    function confirm(DSGroup group, uint id) {
+    function confirm(DSGroup group, uint id) public {
         group.confirm(id);
     }
 }

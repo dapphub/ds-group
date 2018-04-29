@@ -40,11 +40,11 @@ contract DSGroup is DSExec, DSNote {
         bool     triggered;
     }
 
-    function DSGroup(
+    constructor(
         address[]  members_,
         uint       quorum_,
         uint       window_
-    ) {
+    ) public {
         members  = members_;
         quorum   = quorum_;
         window   = window_;
@@ -54,45 +54,45 @@ contract DSGroup is DSExec, DSNote {
         }
     }
 
-    function memberCount() constant returns (uint) {
+    function memberCount() public view returns (uint) {
         return members.length;
     }
 
-    function target(uint id) constant returns (address) {
+    function target(uint id) public view returns (address) {
         return actions[id].target;
     }
-    function calldata(uint id) constant returns (bytes) {
+    function calldata(uint id) public view returns (bytes) {
         return actions[id].calldata;
     }
-    function value(uint id) constant returns (uint) {
+    function value(uint id) public view returns (uint) {
         return actions[id].value;
     }
 
-    function confirmations(uint id) constant returns (uint) {
+    function confirmations(uint id) public view returns (uint) {
         return actions[id].confirmations;
     }
-    function deadline(uint id) constant returns (uint) {
+    function deadline(uint id) public view returns (uint) {
         return actions[id].deadline;
     }
-    function triggered(uint id) constant returns (bool) {
+    function triggered(uint id) public view returns (bool) {
         return actions[id].triggered;
     }
 
-    function confirmed(uint id) constant returns (bool) {
+    function confirmed(uint id) public view returns (bool) {
         return confirmations(id) >= quorum;
     }
-    function expired(uint id) constant returns (bool) {
+    function expired(uint id) public view returns (bool) {
         return now > deadline(id);
     }
 
-    function deposit() note payable {
+    function deposit() public note payable {
     }
 
     function propose(
         address  target,
         bytes    calldata,
         uint     value
-    ) onlyMembers note returns (uint id) {
+    ) public onlyMembers note returns (uint id) {
         id = ++actionCount;
 
         actions[id].target    = target;
@@ -100,25 +100,25 @@ contract DSGroup is DSExec, DSNote {
         actions[id].value     = value;
         actions[id].deadline  = now + window;
 
-        Proposed(id, calldata);
+        emit Proposed(id, calldata);
     }
 
-    function confirm(uint id) onlyMembers onlyActive(id) note {
+    function confirm(uint id) public onlyMembers onlyActive(id) note {
         assert(!confirmedBy[id][msg.sender]);
 
         confirmedBy[id][msg.sender] = true;
         actions[id].confirmations++;
 
-        Confirmed(id, msg.sender);
+        emit Confirmed(id, msg.sender);
     }
 
-    function trigger(uint id) onlyMembers onlyActive(id) note {
+    function trigger(uint id) public onlyMembers onlyActive(id) note {
         assert(confirmed(id));
 
         actions[id].triggered = true;
         exec(actions[id].target, actions[id].calldata, actions[id].value);
 
-        Triggered(id);
+        emit Triggered(id);
     }
 
     modifier onlyMembers {
@@ -136,7 +136,7 @@ contract DSGroup is DSExec, DSNote {
     // Legacy functions
     //------------------------------------------------------------------
 
-    function getInfo() constant returns (
+    function getInfo() public view returns (
         uint  quorum_,
         uint  memberCount,
         uint  window_,
@@ -145,7 +145,7 @@ contract DSGroup is DSExec, DSNote {
         return (quorum, members.length, window, actionCount);
     }
 
-    function getActionStatus(uint id) constant returns (
+    function getActionStatus(uint id) public view returns (
         uint     confirmations,
         uint     deadline,
         bool     triggered,
@@ -169,7 +169,7 @@ contract DSGroupFactory is DSNote {
         address[]  members,
         uint       quorum,
         uint       window
-    ) note returns (DSGroup group) {
+    ) public note returns (DSGroup group) {
         group = new DSGroup(members, quorum, window);
         isGroup[group] = true;
     }
